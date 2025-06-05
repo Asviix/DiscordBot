@@ -1,0 +1,6 @@
+package-lock.json
+package.json
+deploy-commands.js
+ecosystem.config.js
+prod/package.json
+prod/data/
