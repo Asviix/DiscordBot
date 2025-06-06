@@ -1,44 +1,44 @@
-const fs = require('node:fs');
-const path = require('node:path');
-const Database = require('better-sqlite3');
-const statsBotManager = require('./managers/statsBotManager.js');
-const statsCommandsManager = require('./managers/statsCommandsManager.js');
-const guildDataManager = require('./managers/guildDataManager.js');
-const userDataManager = require('./managers/userDataManager.js');
-const logsManager = require('./managers/logsManager.js');
-const crypto = require('node:crypto');
-const logger = require('../modules/logger.js');
-const config = require('../config.js');
+import { existsSync, mkdirSync } from 'node:fs';
+import { resolve, dirname } from 'node:path';
+import Database from 'better-sqlite3';
+import { BOT_STATS_CREATE_TABLE, BOT_STATS_STARTUP_INSERT } from './managers/statsBotManager.js';
+import { STATS_COMMANDS_CREATE_TABLE } from './managers/statsCommandsManager.js';
+import { GUILD_DATA_CREATE_TABLE } from './managers/guildDataManager.js';
+import { USER_DATA_CREATE_TABLE } from './managers/userDataManager.js';
+import { LOGS_CREATE_TABLE } from './managers/logsManager.js';
+import { randomUUID } from 'node:crypto';
+import { loggerDebug, loggerLog } from '../modules/logger.js';
+import { config } from '../config.js';
 
-const dbFilePath = path.resolve(__dirname, 'data', 'database.sqlite');
+const dbFilePath = resolve(import.meta.dirname, 'data', 'database.sqlite');
 
-const dataDir = path.dirname(dbFilePath);
-if (!fs.existsSync(dataDir)) {
-    fs.mkdirSync(dataDir);
+const dataDir = dirname(dbFilePath);
+if (!existsSync(dataDir)) {
+    mkdirSync(dataDir);
 };
 
-const db = new Database(dbFilePath, { verbose: logger.loggerDebug });
+const db = new Database(dbFilePath, { verbose: loggerDebug });
 
 function initializeDatabase() {
-    logger.loggerLog('Initializing database...');
+    loggerLog('Initializing database...');
 
-	statsBotManager.BOT_STATS_CREATE_TABLE(db);
-	statsCommandsManager.STATS_COMMANDS_CREATE_TABLE(db);
-	guildDataManager.GUILD_DATA_CREATE_TABLE(db);
-	userDataManager.USER_DATA_CREATE_TABLE(db);
-	logsManager.LOGS_CREATE_TABLE(db);
+	BOT_STATS_CREATE_TABLE(db);
+	STATS_COMMANDS_CREATE_TABLE(db);
+	GUILD_DATA_CREATE_TABLE(db);
+	USER_DATA_CREATE_TABLE(db);
+	LOGS_CREATE_TABLE(db);
 
-    logger.loggerLog('Database initialized.');
+    loggerLog('Database initialized.');
 };
 
 initializeDatabase();
 
-const currentSessionGUID = crypto.randomUUID();
+const currentSessionGUID = randomUUID();
 const currentSessionStartTimeISO = new Date().toISOString();
-statsBotManager.BOT_STATS_STARTUP_INSERT(db, currentSessionGUID, currentSessionStartTimeISO, config.debugMode, config.apiSafe);
+BOT_STATS_STARTUP_INSERT(db, currentSessionGUID, currentSessionStartTimeISO, config.debugMode, config.apiSafe);
 
-module.exports = {
+export {
 	db,
 	currentSessionGUID,
-	currentSessionStartTimeISO,
+	currentSessionStartTimeISO
 };

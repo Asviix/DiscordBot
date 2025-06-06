@@ -1,7 +1,5 @@
-require('dotenv').config();
-
-const yargs = require('yargs/yargs');
-const { hideBin } = require('yargs/helpers');
+import yargs from 'yargs/yargs';
+import { hideBin } from 'yargs/helpers';
 
 /**
  * The application configuration object.
@@ -39,4 +37,6 @@ const config = {
     apiSafe: argv.apiSafe
 };
 
-module.exports = config;
+export {
+	config
+}

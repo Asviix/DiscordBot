@@ -1,7 +1,6 @@
-const { executeRun } = require('../dbExecutor.js');
-const { UUID } = require('../types.js');
-const sql = require('../sql.js');
-const logger = require('../../modules/logger.js');
+import { executeRun } from '../dbExecutor.js';
+import * as sql from '../sql.js';
+import { loggerError } from '../../modules/logger.js';
 
 let LOGS_LOG_ERROR_TO_DB_INSERT_STMT = null;
 let LOGS_CREATE_TABLE_STMT = null;
@@ -51,7 +50,7 @@ function LOGS_LOG_ERROR_TO_DB_INSERT(dbInstance, sessionGuid, errorObject, conte
         try {
             LOGS_LOG_ERROR_TO_DB_INSERT_STMT = dbInstance.prepare(sql.LOGS_LOG_ERROR_TO_DB);
         } catch (error) {
-            logger.loggerError(`[DB] Error preparing LOGS_LOG_ERROR_TO_DB_INSERT_STMT statement: ${error.message}`);
+            loggerError(`[DB] Error preparing LOGS_LOG_ERROR_TO_DB_INSERT_STMT statement: ${error.message}`);
             return { success: false, error: error };
         };
     };
@@ -68,7 +67,7 @@ function LOGS_LOG_ERROR_TO_DB_INSERT(dbInstance, sessionGuid, errorObject, conte
     );
 
     if (!result.success) {
-        logger.loggerError(`[CRITICAL FALLBACK] Failed to log an error to DB. Original error message: ${detailedErrorMessage}`);
+        loggerError(`[CRITICAL FALLBACK] Failed to log an error to DB. Original error message: ${detailedErrorMessage}`);
     };
 
     return result;
@@ -84,20 +83,20 @@ function LOGS_CREATE_TABLE(dbInstance) {
         try {
             LOGS_CREATE_TABLE_STMT = dbInstance.prepare(sql.LOGS_CREATE_TABLE);
         } catch (error) {
-            logger.loggerError(`[DB] Error preparing LOGS_CREATE_TABLE_STMT statement: ${error.message}`);
+            loggerError(`[DB] Error preparing LOGS_CREATE_TABLE_STMT statement: ${error.message}`);
             return { success: false, error: error };
         };
     };
 
     const createResult = executeRun(LOGS_CREATE_TABLE_STMT);
     if (!createResult.success) {
-        logger.loggerError('[DB] Failed to create logs table.');
+        loggerError('[DB] Failed to create logs table.');
     };
 
     return createResult;
 };
 
-module.exports = {
+export {
     LOGS_LOG_ERROR_TO_DB_INSERT,
     LOGS_CREATE_TABLE
 };

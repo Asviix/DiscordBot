@@ -1,6 +1,6 @@
-const { executeRun } = require('../dbExecutor.js');
-const sql = require('../sql.js');
-const logger = require('../../modules/logger.js');
+import { executeRun } from '../dbExecutor.js';
+import * as sql from '../sql.js';
+import { loggerError } from '../../modules/logger.js';
 
 let BOT_STATS_STARTUP_INSERT_STMT = null;
 let BOT_STATS_INCREMENT_COMMANDS_RAN_UPDATE_STMT = null;
@@ -21,14 +21,14 @@ function BOT_STATS_STARTUP_INSERT(dbInstance, sessionGuid, startTimeISO, debugMo
         try {
             BOT_STATS_STARTUP_INSERT_STMT = dbInstance.prepare(sql.STATS_BOT_STARTUP_INSERT);
         } catch (error) {
-            logger.loggerError(`[DB] Error preparing BOT_STATS_STARTUP_INSERT statement: ${error.message}`);
+            loggerError(`[DB] Error preparing BOT_STATS_STARTUP_INSERT statement: ${error.message}`);
             return {success: false, error: error};
         };
     };
 
     const insertResult = executeRun(BOT_STATS_STARTUP_INSERT_STMT, sessionGuid, startTimeISO, debugMode?1:0, apiSafe?1:0)
     if (!insertResult.success) {
-        logger.loggerError(`[DB] Failed to create bot stats record for session ${sessionGuid}.`);
+        loggerError(`[DB] Failed to create bot stats record for session ${sessionGuid}.`);
     };
 
     return insertResult;
@@ -50,14 +50,14 @@ function BOT_STATS_INCREMENT_COMMANDS_RAN_UPDATE(dbInstance, sessionGuid) {
         try {
             BOT_STATS_INCREMENT_COMMANDS_RAN_UPDATE_STMT = dbInstance.prepare(sql.STATS_BOT_INCREMENT_COMMANDS_RAN_UPDATE);
         } catch (error) {
-            logger.loggerError(`[DB] Error preparing BOT_STATS_INCREMENT_COMMANDS_RAN_UPDATE statement: ${error.message}`);
+            loggerError(`[DB] Error preparing BOT_STATS_INCREMENT_COMMANDS_RAN_UPDATE statement: ${error.message}`);
             return {success: false, error: error};
         }
     };
 
     const updateResult = executeRun(BOT_STATS_INCREMENT_COMMANDS_RAN_UPDATE_STMT, sessionGuid);
     if (!updateResult.success) {
-        logger.loggerError(`[DB] Failed to increment commands_ran for session ${sessionGuid}.`);
+        loggerError(`[DB] Failed to increment commands_ran for session ${sessionGuid}.`);
     };
 
     return updateResult;
@@ -79,14 +79,14 @@ function BOT_STATS_INCREMENT_ERRORS_LOGGED_UPDATE(dbInstance, sessionGuid) {
         try {
             BOT_STATS_INCREMENT_ERRORS_LOGGED_UPDATE_STMT = dbInstance.prepare(sql.STATS_BOT_INCREMENT_ERRORS_LOGGED_UPDATE);
         } catch (error) {
-            logger.loggerError(`[DB] Error preparing BOT_STATS_INCREMENT_ERRORS_LOGGED_UPDATE statement: ${error.message}`);
+            loggerError(`[DB] Error preparing BOT_STATS_INCREMENT_ERRORS_LOGGED_UPDATE statement: ${error.message}`);
             return {success: false, error: error};
         }
     };
 
     const updateResult = executeRun(BOT_STATS_INCREMENT_ERRORS_LOGGED_UPDATE_STMT, sessionGuid);
     if (!updateResult.success) {
-        logger.loggerError(`[DB] Failed to increment errors_logged for session ${sessionGuid}.`);
+        loggerError(`[DB] Failed to increment errors_logged for session ${sessionGuid}.`);
     };
 
     return updateResult;
@@ -102,22 +102,22 @@ function BOT_STATS_CREATE_TABLE(dbInstance) {
         try {
             BOT_STATS_CREATE_TABLE_STMT = dbInstance.prepare(sql.STATS_BOT_CREATE_TABLE);
         } catch (error) {
-            logger.loggerError(`[DB] Error preparing BOT_STATS_CREATE_TABLE statement: ${error.message}`);
+            loggerError(`[DB] Error preparing BOT_STATS_CREATE_TABLE statement: ${error.message}`);
             return {success: false, error: error};
         }
     };
 
     const createResult = executeRun(BOT_STATS_CREATE_TABLE_STMT);
     if (!createResult.success) {
-        logger.loggerError('[DB] Failed to create bot_stats table.');
+        loggerError('[DB] Failed to create bot_stats table.');
     }
 
     return createResult;
 };
 
-module.exports = {
+export {
     BOT_STATS_STARTUP_INSERT,
     BOT_STATS_INCREMENT_COMMANDS_RAN_UPDATE,
     BOT_STATS_INCREMENT_ERRORS_LOGGED_UPDATE,
     BOT_STATS_CREATE_TABLE
-}
+};

@@ -1,4 +1,4 @@
-const logger = require('../modules/logger.js');
+import { loggerError } from '../modules/logger.js';
 
 /**
  * Executes a prepared statement that doesn't return rows (INSERT, UPDATE, DELETE).
@@ -12,7 +12,7 @@ function executeRun(statement, ...params) {
         return { success: true, info: info }; // 'info' contains 'changes' and 'lastInsertRowid'
     } catch (error) {
         // Use your logger here
-        logger.loggerError(`[DB EXECUTE RUN ERROR] Statement: ${statement.source}`, error); 
+        loggerError(`[DB EXECUTE RUN ERROR] Statement: ${statement.source}`, error); 
         // logger.loggerError(`SQLite Error executing statement: ${statement.source}`, error);
         return { success: false, error: error };
     };
@@ -29,7 +29,7 @@ function executeGet(statement, ...params) {
         const row = statement.get(...params);
         return { success: true, data: row };
     } catch (error) {
-        logger.loggerError(`[DB EXECUTE GET ERROR] Statement: ${statement.source}`, error);
+        loggerError(`[DB EXECUTE GET ERROR] Statement: ${statement.source}`, error);
         // logger.loggerError(`SQLite Error executing query (get): ${statement.source}`, error);
         return { success: false, error: error, data: undefined };
     };
@@ -46,13 +46,13 @@ function executeAll(statement, ...params) {
         const rows = statement.all(...params);
         return { success: true, data: rows };
     } catch (error) {
-        logger.loggerError(`[DB EXECUTE ALL ERROR] Statement: ${statement.source}`, error);
+        loggerError(`[DB EXECUTE ALL ERROR] Statement: ${statement.source}`, error);
         // logger.loggerError(`SQLite Error executing query (all): ${statement.source}`, error);
         return { success: false, error: error, data: [] };
     };
 };
 
-module.exports = {
+export {
     executeRun,
     executeGet,
     executeAll

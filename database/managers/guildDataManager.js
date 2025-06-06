@@ -1,8 +1,9 @@
-const { executeRun } = require('../dbExecutor.js');
-const sql = require('../sql.js');
-const logger = require('../../modules/logger.js');
+import { executeRun } from '../dbExecutor.js';
+import * as sql from '../sql.js';
+import { loggerError } from '../../modules/logger.js';
 
 let GUILD_DATA_NEW_GUILD_INSERT_STMT = null;
+let GUILD_DATA_COMMANDS_RAN_INCREMENT_STMT = null;
 let GUILD_DATA_CREATE_TABLE_STMT = null;
 
 /**
@@ -17,17 +18,41 @@ function GUILD_DATA_NEW_GUILD_INSERT(dbInstance, guildId) {
         try {
             GUILD_DATA_NEW_GUILD_INSERT_STMT = dbInstance.prepare(sql.GUILD_DATA_NEW_GUILD_INSERT);
         } catch (error) {
-            logger.loggerError(`[DB] Error preparing GUILD_DATA_NEW_GUILD_INSERT_STMT statement: ${error.message}`);
+            loggerError(`[DB] Error preparing GUILD_DATA_NEW_GUILD_INSERT_STMT statement: ${error.message}`);
             return { success: false, error: error };
         }
     };
     
     const insertResult = executeRun(GUILD_DATA_NEW_GUILD_INSERT_STMT, guildId);
     if (!insertResult.success) {
-        logger.loggerError(`[DB] Failed to ensure guild data (insert step) for guild ${guildId}.`);
+        loggerError(`[DB] Failed to ensure guild data (insert step) for guild ${guildId}.`);
     };
 
     return insertResult;
+};
+
+/**
+ * Increments the commands_ran count for a guild.
+ * @param {import('better-sqlite3').Database} dbInstance - The database instance.
+ * @param {string} guildId - The ID of the guild.
+ * @returns {DbRunResult} The result of the update operation.
+ */
+function GUILD_DATA_COMMANDS_RAN_INCREMENT(dbInstance, guildId) {
+    if (!GUILD_DATA_COMMANDS_RAN_INCREMENT_STMT) {
+        try {
+            GUILD_DATA_COMMANDS_RAN_INCREMENT_STMT = dbInstance.prepare(sql.GUILD_DATA_COMMANDS_RAN_INCREMENT);
+        } catch (error) {
+            loggerError(`[DB] Error preparing GUILD_DATA_COMMANDS_RAN_INCREMENT_STMT statement: ${error.message}`);
+            return { success: false, error: error };
+        }
+    };
+    const params = [guildId];
+    const updateResult = executeRun(GUILD_DATA_COMMANDS_RAN_INCREMENT_STMT, params);
+    if (!updateResult.success) {
+        loggerError(`[DB] Failed to increment commands_ran for guild ${guildId}.`);
+    };
+
+    return updateResult;
 };
 
 /**
@@ -40,20 +65,21 @@ function GUILD_DATA_CREATE_TABLE(dbInstance) {
         try {
             GUILD_DATA_CREATE_TABLE_STMT = dbInstance.prepare(sql.GUILD_DATA_CREATE_TABLE);
         } catch (error) {
-            logger.loggerError(`[DB] Error preparing GUILD_DATA_CREATE_TABLE_STMT statement: ${error.message}`);
+            loggerError(`[DB] Error preparing GUILD_DATA_CREATE_TABLE_STMT statement: ${error.message}`);
             return { success: false, error: error };
         }
     };
 
     const createResult = executeRun(GUILD_DATA_CREATE_TABLE_STMT);
     if (!createResult.success) {
-        logger.loggerError('[DB] Failed to create guild_data table.');
+        loggerError('[DB] Failed to create guild_data table.');
     };
 
     return createResult;
 };
 
-module.exports = {
+export {
     GUILD_DATA_NEW_GUILD_INSERT,
+    GUILD_DATA_COMMANDS_RAN_INCREMENT,
     GUILD_DATA_CREATE_TABLE
 };

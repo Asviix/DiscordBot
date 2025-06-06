@@ -27,3 +27,5 @@
  * @property {any} [data] - The data row returned by the operation, if applicable.
  * @property {Error} [error]
  */
+
+export {};

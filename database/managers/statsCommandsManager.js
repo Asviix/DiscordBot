@@ -1,6 +1,6 @@
-const { executeRun } = require('../dbExecutor.js');
-const sql = require('../sql.js');
-const logger = require('../../modules/logger.js');
+import { executeRun } from '../dbExecutor.js';
+import * as sql from '../sql.js';
+import { loggerError } from '../../modules/logger.js';
 
 let STATS_COMMANDS_CREATE_TABLE_STMT = null;
 let STATS_COMMANDS_INCREMENT_EXECUTION_COUNT_STMT = null;
@@ -15,7 +15,7 @@ function STATS_COMMANDS_INCREMENT_EXECUTION_COUNT(dbInstance, commandName) {
         try {
             STATS_COMMANDS_INCREMENT_EXECUTION_COUNT_STMT = dbInstance.prepare(sql.STATS_COMMANDS_INCREMENT_EXECUTION_COUNT);
         } catch (error) {
-            logger.loggerError(`[DB] Error preparing STATS_COMMANDS_INCREMENT_EXECUTION_COUNT_STMT statement: ${error.message}`);
+            loggerError(`[DB] Error preparing STATS_COMMANDS_INCREMENT_EXECUTION_COUNT_STMT statement: ${error.message}`);
             return { success: false, error: error };
         };
     };
@@ -23,7 +23,7 @@ function STATS_COMMANDS_INCREMENT_EXECUTION_COUNT(dbInstance, commandName) {
     const params = [commandName];
     const updateResult = executeRun(STATS_COMMANDS_INCREMENT_EXECUTION_COUNT_STMT, params);
     if (!updateResult.success) {
-        logger.loggerError(`[DB] Failed to increment execution count for command: ${commandName}`);
+        loggerError(`[DB] Failed to increment execution count for command: ${commandName}`);
     };
 
     return updateResult;
@@ -38,20 +38,20 @@ function STATS_COMMANDS_CREATE_TABLE(dbInstance) {
         try {
             STATS_COMMANDS_CREATE_TABLE_STMT = dbInstance.prepare(sql.STATS_COMMANDS_CREATE_TABLE);
         } catch (error) {
-            logger.loggerError(`[DB] Error preparing STATS_COMMANDS_CREATE_TABLE_STMT statement: ${error.message}`);
+            loggerError(`[DB] Error preparing STATS_COMMANDS_CREATE_TABLE_STMT statement: ${error.message}`);
             return { success: false, error: error };
         }
     };
 
     const createResult = executeRun(STATS_COMMANDS_CREATE_TABLE_STMT);
     if (!createResult.success) {
-        logger.loggerError('[DB] Failed to create stats_commands table.');
+        loggerError('[DB] Failed to create stats_commands table.');
     };
 
     return createResult;
 };
 
-module.exports = {
+export {
     STATS_COMMANDS_INCREMENT_EXECUTION_COUNT,
     STATS_COMMANDS_CREATE_TABLE
 };

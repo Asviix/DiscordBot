@@ -1,16 +1,13 @@
-const Discord = require('discord.js');
+import { SlashCommandBuilder, InteractionContextType, EmbedBuilder } from 'discord.js';
 
-module.exports = {
-    category: 'plugin',
-    cooldown: 5,
-    data: new Discord.SlashCommandBuilder()
-        .setName('plugin_version')
-        .setDescription('Get the latest version of the F1 Manager 2024 SimHub plugin')
-        .setContexts([Discord.InteractionContextType.Guild, Discord.InteractionContextType.BotDM]),
-        
-    /** @param {Discord.ChatInputCommandInteraction} interaction */
-    execute(interaction) {
-        const embed = new Discord.EmbedBuilder()
+export const category = 'plugin';
+export const cooldown = 5;
+export const data = new SlashCommandBuilder()
+    .setName('plugin_version')
+    .setDescription('Get the latest version of the F1 Manager 2024 SimHub plugin')
+    .setContexts([InteractionContextType.Guild, InteractionContextType.BotDM]);
+export function execute(interaction) {
+    const embed = new EmbedBuilder()
         .setAuthor({
             name: interaction.guild.members.me.displayName,
             iconURL: interaction.client.user.displayAvatarURL(),
@@ -23,8 +20,7 @@ module.exports = {
         })
         .setTimestamp();
 
-        return interaction.reply({
-            embeds: [embed]
-        });
-    },
-};
+    return interaction.reply({
+        embeds: [embed]
+    });
+}

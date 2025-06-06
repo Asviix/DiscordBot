@@ -1,4 +1,4 @@
-const args = require('../config')
+import * as config from '../config.js';
 
 function createNewDate() {
     const now = new Date();
@@ -74,15 +74,13 @@ function warning(message) {
 };
 
 function debug(message) {
-    if (args.debugMode) {
+    if (config.debugMode) {
         console.debug(`${createNewDate()} [DEBUG] ${message}`);
     }
 };
 
-module.exports = {
-    loggerError: error,
-    loggerLog: log,
-    loggerSuccess: success,
-    loggerWarning: warning,
-    loggerDebug: debug,
-}
+export const loggerError = error;
+export const loggerLog = log;
+export const loggerSuccess = success;
+export const loggerWarning = warning;
+export const loggerDebug = debug;
