@@ -3,75 +3,9 @@ const path = require('node:path');
 const Discord = require('discord.js');
 const config = require('./config.js');
 const logger = require('./modules/logger.js');
-const Database = require('better-sqlite3');
-const dbUtils = require('./dbUtils.js');
-const crypto = require('node:crypto');
+const { db, currentSessionGUID } = require('./database/database.js');
 
 logger.loggerDebug('Debug Mode is Enabled!');
-
-const dbFilePath = path.resolve(__dirname, 'data', 'databse.sqlite');
-
-const dataDir = path.dirname(dbFilePath);
-if (!fs.existsSync(dataDir)) {
-    fs.mkdirSync(dataDir);
-};
-
-const db = new Database(dbFilePath, { verbose: logger.loggerDebug });
-
-function initializeDatabase() {
-    logger.loggerLog('Initializing database...');
-
-    const createUserDataTable = db.prepare(`
-        CREATE TABLE IF NOT EXISTS user_data (
-        user_id TEXT NOT NULL,
-        guild_id TEXT NOT NULL,
-		PRIMARY KEY (user_id, guild_id)
-        );
-		
-    `);
-    createUserDataTable.run();
-
-    const createGuildDataTable = db.prepare(`
-        CREATE TABLE IF NOT EXISTS guild_data (
-        guild_id TEXT PRIMARY KEY
-        );
-    `);
-    createGuildDataTable.run();
-
-	const createBotStatsDataTable = db.prepare(`
-		CREATE TABLE IF NOT EXISTS bot_stats (
-		session_guid TEXT NOT NULL PRIMARY KEY,
-		start_time TEXT NOT NULL,
-		debug_mode INTEGER NOT NULL,
-		api_safe INTEGER NOT NULL,
-		commands_ran INTEGER NOT NULL DEFAULT 0,
-		errors_logged INTEGER NOT NULL DEFAULT 0
-		);
-	`);
-	createBotStatsDataTable.run();
-
-	const createLogsDataTable = db.prepare(`
-		CREATE TABLE IF NOT EXISTS logs (
-		error_id INTEGER PRIMARY KEY AUTOINCREMENT,
-		session_guid TEXT NOT NULL,
-		timestamp DATETIME DEFAULT CURRENT_TIMESTAMP,
-		guild_id TEXT,
-		user_id TEXT,
-		command TEXT,
-		error_message TEXT NOT NULL,
-		stack_trace TEXT
-		)
-	`);
-	createLogsDataTable.run();
-
-    logger.loggerLog('Database initialized.');
-};
-
-initializeDatabase();
-
-const currentSessionGUID = crypto.randomUUID();
-const currentSessionStartTimeISO = new Date().toISOString();
-dbUtils.createBotStats(db, currentSessionGUID, currentSessionStartTimeISO, config.debugMode?1:0, config.apiSafe?1:0);
 
 const client = new Discord.Client({
     intents: [ Discord.GatewayIntentBits.Guilds]
@@ -114,5 +48,3 @@ client.login(config.token)
         logger.loggerError(`${createNewDate()} Error logging in:`, error);
         process.exit(1);
     });
-
-module.exports = db;

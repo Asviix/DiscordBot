@@ -1,6 +1,10 @@
 const Discord = require('discord.js');
 const logger = require('../modules/logger.js');
-const dbUtils = require('../dbUtils.js')
+const guildDataManager = require('../database/managers/guildDataManager.js');
+const userDataManager = require('../database/managers/userDataManager.js');
+const logsManager = require('../database/managers/logsManager.js');
+const statsCommandsManager = require('../database/managers/statsCommandsManager.js');
+const statsBotManager = require('../database/managers/statsBotManager.js');
 
 module.exports = {
 	name: Discord.Events.InteractionCreate,
@@ -8,16 +12,8 @@ module.exports = {
 	/** @param {Discord.ChatInputCommandInteraction} interaction */
 	async execute(interaction, db, guid) {
 
-		const guildData = dbUtils.ensureGuildData(db, interaction.guild.id);
-		const userData = dbUtils.ensureUserData(db, interaction.user.id, interaction.guild.id);
-
-		if (!guildData || !userData) {
-			await interaction.reply({
-				content: 'Count not retrieve databse data.',
-				flags: Discord.MessageFlags.Ephemeral
-			});
-			return;
-		};
+		guildDataManager.GUILD_DATA_NEW_GUILD_INSERT(db, interaction.guild.id);
+		userDataManager.USER_DATA_NEW_USER_INSERT(db, interaction.user.id, interaction.guild.id);
 
 		const { cooldowns } = interaction.client;
 
@@ -55,14 +51,15 @@ module.exports = {
 		timestamps.set(interaction.user.id, now);
 		setTimeout(() => timestamps.delete(interaction.user.id), cooldownAmount);
 
-		dbUtils.incrementCommandsRan(db, guid);
+		statsBotManager.BOT_STATS_INCREMENT_COMMANDS_RAN_UPDATE(db, guid);
+		statsCommandsManager.STATS_COMMANDS_INCREMENT_EXECUTION_COUNT(db, interaction.commandName);
 
 		try {
-			await command.execute(interaction);
+			await command.execute(interaction, db, guid);
 			return logger.loggerDebug(`Executed command: "${interaction.commandName}" in guild: "${interaction.guild.name}" by user: "${interaction.user.tag}"`);
 		} catch (error) {
-			dbUtils.incrementErrorsLogged(db, guid);
-			dbUtils.logErrorToDB(db, guid, error, {
+			statsBotManager.BOT_STATS_INCREMENT_ERRORS_LOGGED_UPDATE(db, guid);
+			logsManager.LOGS_LOG_ERROR_TO_DB_INSERT(db, guid, error, {
 				guildId: interaction.guild.id,
 				userId: interaction.user.id,
 				commandName: interaction.commandName

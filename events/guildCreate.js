@@ -11,7 +11,7 @@ module.exports = {
 
         guild.fetchOwner()
             .then(owner => {
-                owner.send('Boo!\nThis bot is still in **ACTIVE DEVELOPMENT, YOU SHOULD NOT ADD IT!');
+                owner.send('Boo!\nThis bot is still in **ACTIVE DEVELOPMENT, YOU SHOULD NOT ADD IT!**');
             });
     },
 };
