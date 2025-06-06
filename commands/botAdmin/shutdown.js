@@ -1,33 +1,31 @@
-const Discord = require('discord.js');
-const config = require('../../config.js');
-const logger = require('../../modules/logger.js');
+import { SlashCommandBuilder, MessageFlags } from 'discord.js';
+import { config } from '../../config.js';
+import { loggerSuccess } from '../../modules/logger.js';
 
-module.exports = {
-    category: 'botAdmin',
-    data: new Discord.SlashCommandBuilder()
-        .setName('shutdown')
-        .setDescription('RESTRICTED TO BOT ADMINS'),
-
+export const category = 'botAdmin';
+export const data = new SlashCommandBuilder()
+    .setName('shutdown')
+    .setDescription('RESTRICTED TO BOT ADMINS');
+export
     /** @param {Discord.ChatInputCommandInteraction} interaction */
-    async execute(interaction) {
-        if (interaction.user.id !== '244370207190024193') {
-            return interaction.reply({
-                content: 'You do not have permission to use this command.',
-                flags: Discord.MessageFlags.Ephemeral
-            });
-        };
-        await interaction.reply({
-            content: 'Shutting down the bot...',
-            flags: Discord.MessageFlags.Ephemeral
+    async function execute(interaction) {
+    if (interaction.user.id !== '244370207190024193') {
+        return interaction.reply({
+            content: 'You do not have permission to use this command.',
+            flags: MessageFlags.Ephemeral
         });
+    };
+    await interaction.reply({
+        content: 'Shutting down the bot...',
+        flags: MessageFlags.Ephemeral
+    });
 
-        if (!config.apiSafe) {
-            interaction.client.channels.cache.get(config.statusVoiceChannelId).setName('❌ Status: Offline!');
-            logger.loggerSuccess('Status channel changed successfully!');
-        }
+    if (!config.apiSafe) {
+        interaction.client.channels.cache.get(config.statusVoiceChannelId).setName('❌ Status: Offline!');
+        loggerSuccess('Status channel changed successfully!');
+    }
 
-        logger.loggerSuccess('Bot is shutting down...');
-        await interaction.client.destroy()
-        process.exit(0);
-    },
+    loggerSuccess('Bot is shutting down...');
+    await interaction.client.destroy();
+    process.exit(0);
 }
