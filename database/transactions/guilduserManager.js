@@ -1,6 +1,6 @@
 import { loggerError } from '../../modules/logger.js';
-import { GUILD_DATA_NEW_GUILD_INSERT } from '../database/managers/guildDataManager.js';
-import { USER_DATA_NEW_USER_INSERT } from '../database/managers/userDataManager.js';
+import { GUILD_DATA_NEW_GUILD_INSERT } from '../managers/guildDataManager.js';
+import { USER_DATA_NEW_USER_INSERT } from '../managers/userDataManager.js';
 
 /**
  * Inserts a new guild and user into the database.
