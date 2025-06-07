@@ -1,5 +1,5 @@
 import { loggerError } from '../../modules/logger.js';
-import { BOT_STATS_INCREMENT_COMMANDS_RAN_UPDATE } from '../managers/statsBotManager.js';
+import { BOT_STATS_INCREMENT_ERRORS_LOGGED_UPDATE } from '../managers/statsBotManager.js';
 import { LOGS_LOG_ERROR_TO_DB_INSERT } from '../managers/logsManager.js';
 
 /**
@@ -15,11 +15,11 @@ import { LOGS_LOG_ERROR_TO_DB_INSERT } from '../managers/logsManager.js';
  * @param {Error} context.error - The error that occurred during command execution.
  * @returns {DbRunResult} The result of the database operations.
  */
-function handleError(dbInstance, context) {
+export function handleError(dbInstance, context) {
     const { guid, commandName, guildId, userId, error} = context;
 
     const transaction = dbInstance.transaction(() => {
-        BOT_STATS_INCREMENT_COMMANDS_RAN_UPDATE(dbInstance, guid);
+        BOT_STATS_INCREMENT_ERRORS_LOGGED_UPDATE(dbInstance, guid);
         LOGS_LOG_ERROR_TO_DB_INSERT(dbInstance, {
             guid: guid,
             commandName: commandName,
@@ -34,10 +34,6 @@ function handleError(dbInstance, context) {
     } catch (transactionError) {
         loggerError(`[DB] Failed to handle error: ${transactionError.message}`);
         return { success: false, error: transactionError };
-    }
+    };
     return { success: true };
-};
-
-export {
-    handleError
 };

@@ -5,9 +5,9 @@ export const cooldown = 5;
 export const data = new SlashCommandBuilder()
 	.setName('ping')
 	.setDescription('Get the bot\'s ping');
-export
-	/** @param {Discord.ChatInputCommandInteraction} interaction */
-	async function execute(interaction) {
+
+/** @param {import('discord.js').ChatInputCommandInteraction} interaction */
+export async function execute(interaction, db, guid) {
 	let circles = {
 		good: '🟢',
 		okay: '🟡',
@@ -58,4 +58,4 @@ export
 		.setTimestamp();
 
 	return interaction.editReply({ embeds: [pingEmbed], content: '\u200b' });
-}
+};

@@ -10,9 +10,9 @@ export const data = new SlashCommandBuilder()
         .setRequired(false)
     )
     .setContexts(InteractionContextType.Guild);
-export
-    /** @param {Discord.ChatInputCommandInteraction} interaction */
-    async function execute(interaction) {
+
+/** @type {import('../../database/types').CommandExecuteFunction} */
+export async function execute(interaction, db, guid) {
 
     const member = interaction.options.getMember('user');
 

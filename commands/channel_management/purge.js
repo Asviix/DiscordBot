@@ -16,9 +16,9 @@ export const data = new SlashCommandBuilder()
     )
     .setDefaultMemberPermissions(PermissionFlagsBits.ManageChannels, PermissionFlagsBits.ManageMessages)
     .setContexts(InteractionContextType.Guild);
-export
-    /** @param {Discord.ChatInputCommandInteraction} interaction */
-    async function execute(interaction) {
+
+/** @type {import('../../database/types').CommandExecuteFunction} */
+export async function execute(interaction, db, guid) {
     const targetChannel = interaction.options.getChannel('channel') || interaction.channel;
     const amount = interaction.options.getInteger('amount');
 

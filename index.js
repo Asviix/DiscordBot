@@ -14,8 +14,7 @@ const client = new Client({
 });
 
 client.cooldowns = new Collection();
-client.commands = new  Collection();
-const foldersPath = join(import.meta.dirname, 'commands');
+client.commands = new Collection();
 
 // Use an async IIFE (Immediately Invoked Function Expression) to handle top-level await
 (async () => {

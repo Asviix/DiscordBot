@@ -6,9 +6,9 @@ export const category = 'botAdmin';
 export const data = new SlashCommandBuilder()
     .setName('shutdown')
     .setDescription('RESTRICTED TO BOT ADMINS');
-export
-    /** @param {Discord.ChatInputCommandInteraction} interaction */
-    async function execute(interaction) {
+
+/** @type {import('../../database/types.js').CommandExecuteFunction} */
+export async function execute(interaction, db, guid) {
     if (interaction.user.id !== '244370207190024193') {
         return interaction.reply({
             content: 'You do not have permission to use this command.',

@@ -28,4 +28,12 @@
  * @property {Error} [error]
  */
 
+/**
+ * @callback CommandExecuteFunction
+ * @param {import('discord.js').ChatInputCommandInteraction} interaction
+ * @param {import('better-sqlite3').Database} db
+ * @param {import('./types.js').UUID} guid
+ * @returns {Promise<any> | any}
+ */
+
 export {};

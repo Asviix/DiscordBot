@@ -10,7 +10,9 @@ export const data = new SlashCommandBuilder()
 		.setDescription('Command to reload.')
 		.setRequired(true)
 	);
-export function execute(interaction) {
+
+/** @type {import('../../database/types.js').CommandExecuteFunction} */
+export function execute(interaction, db, guid) {
 	if (interaction.user.id !== '244370207190024193') {
 		return interaction.reply({
 			content: 'You do not have permission to use this command.',

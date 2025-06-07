@@ -35,9 +35,9 @@ export const data = new SlashCommandBuilder()
     )
     .setDefaultMemberPermissions(PermissionFlagsBits.ManageThreads)
     .setContexts([InteractionContextType.Guild]);
-export
-    /** @param {Discord.ChatInputCommandInteraction} interaction */
-    async function execute(interaction) {
+
+/** @type {import('../../database/types.js').CommandExecuteFunction} */
+export async function execute(interaction, db, guid) {
 
     const sourceThread = interaction.options.getChannel('source_thread');
     const targetThread = interaction.options.getChannel('target_thread');

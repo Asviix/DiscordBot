@@ -13,7 +13,9 @@ export const data = new SlashCommandBuilder()
         .setDescription('The .js file **full name**')
         .setRequired(true)
     );
-export function execute(interaction) {
+
+/** @type {import('../../database/types').CommandExecuteFunction} */
+export function execute(interaction, db, guid) {
     if (interaction.user.id !== '244370207190024193') {
         return interaction.reply({
             content: 'You do not have permission to use this command.',
@@ -26,7 +28,7 @@ export function execute(interaction) {
 
     const filePath = join(__dirname, '../', category, file);
 
-    const command = require(filePath);
+    const command = import(filePath);
 
     if ('data' in command && 'execute' in command) {
         if (interaction.client.commands.get(command.data.name)) {

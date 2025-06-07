@@ -16,7 +16,7 @@ import { BOT_STATS_INCREMENT_COMMANDS_RAN_UPDATE } from '../managers/statsBotMan
  * @param {string} context.userId - The ID of the user who executed the command.
  * @returns {DbRunResult} The result of the database operations.
  */
-function incrementExecutionCountStats(dbInstance, context) {
+export function incrementExecutionCountStats(dbInstance, context) {
     const { guid, commandName, guildId, userId } = context;
 
     const transaction = dbInstance.transaction(() => {
@@ -33,8 +33,4 @@ function incrementExecutionCountStats(dbInstance, context) {
         return { success: false, error: error };
     }
     return { success: true };
-};
-
-export {
-    incrementExecutionCountStats
 };

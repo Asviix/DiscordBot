@@ -31,7 +31,9 @@ export const data = new SlashCommandBuilder()
             { name: 'Watching', value: 3 })
         .setRequired(true)
     );
-export function execute(interaction) {
+
+/** @type {import('../../database/types').CommandExecuteFunction} */
+export function execute(interaction, db, guid) {
     const status = interaction.options.getString('status');
     const afk = interaction.options.getBoolean('afk');
     const name = interaction.options.getString('name');

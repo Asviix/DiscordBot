@@ -1,19 +1,13 @@
-import { Events, Collection, PermissionFlagsBits, MessageFlags } from 'discord.js';
+import { Events, MessageFlags } from 'discord.js';
 import { loggerDebug, loggerError } from '../modules/logger.js';
-import { GUILD_DATA_NEW_GUILD_INSERT } from '../database/managers/guildDataManager.js';
-import { USER_DATA_NEW_USER_INSERT } from '../database/managers/userDataManager.js';
-import { incrementExecutionCountStats } from '../database/transactions/statsManager.js';
-import { handleError } from '../database/transactions/errorManager.js';
+import { incrementExecutionCountStats, handleError, insertNewGuildAndUser } from '../database/transactions/manager.js'
+import { checkCooldown } from '../modules/cooldown.js';
 
 export const name = Events.InteractionCreate;
-export
-	/** @param {Discord.ChatInputCommandInteraction} interaction */
-	async function execute(interaction, db, guid) {
 
-	GUILD_DATA_NEW_GUILD_INSERT(db, interaction.guild.id);
-	USER_DATA_NEW_USER_INSERT(db, interaction.user.id, interaction.guild.id);
-
-	const { cooldowns } = interaction.client;
+/** @type {import('../database/types.js').CommandExecuteFunction} */
+export async function execute(interaction, db, guid) {
+	insertNewGuildAndUser(db, interaction.guild.id, interaction.user.id);
 
 	if (!interaction.isChatInputCommand()) {
 		return;
@@ -25,29 +19,13 @@ export
 		return;
 	};
 
-	if (!cooldowns.has(command.data.name)) {
-		cooldowns.set(command.data.name, new Collection());
+	const cooldownCheck = checkCooldown(interaction, command);
+	if (cooldownCheck.onCooldown) {
+		return interaction.reply({
+			content: cooldownCheck.reply,
+			flags: MessageFlags.Ephemeral
+		});
 	};
-
-	const now = Date.now();
-	const timestamps = cooldowns.get(command.data.name);
-	const defaultCooldownDuration = 3;
-	const cooldownAmount = (command.cooldown ?? defaultCooldownDuration) * 1000;
-
-	if (timestamps.has(interaction.user.id)) {
-		const expirationTime = timestamps.get(interaction.user.id) + cooldownAmount;
-
-		if (now < expirationTime && !interaction.member.permissions.has(PermissionFlagsBits.Administrator)) {
-			const expiredTimestamp = Math.round(expirationTime / 1000);
-			return interaction.reply({
-				content: `⌛ Please wait, you are on a cooldown for \`${command.data.name}\`. You can use it again <t:${expiredTimestamp}:R>.`,
-				flags: MessageFlags.Ephemeral
-			});
-		};
-	};
-
-	timestamps.set(interaction.user.id, now);
-	setTimeout(() => timestamps.delete(interaction.user.id), cooldownAmount);
 
 	incrementExecutionCountStats(db, {
 		guid: guid,

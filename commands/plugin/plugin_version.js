@@ -6,7 +6,9 @@ export const data = new SlashCommandBuilder()
     .setName('plugin_version')
     .setDescription('Get the latest version of the F1 Manager 2024 SimHub plugin')
     .setContexts([InteractionContextType.Guild, InteractionContextType.BotDM]);
-export function execute(interaction) {
+
+/** @type {import('../../database/types').CommandExecuteFunction} */
+export function execute(interaction, db, guid) {
     const embed = new EmbedBuilder()
         .setAuthor({
             name: interaction.guild.members.me.displayName,
