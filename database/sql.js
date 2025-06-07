@@ -1,10 +1,14 @@
 export const STATS_BOT_STARTUP_INSERT = `INSERT OR IGNORE INTO stats_bot  (session_guid, start_time, debug_mode, api_safe) VALUES (?, ?, ?, ?)`;
 export const STATS_BOT_INCREMENT_COMMANDS_RAN_UPDATE = `UPDATE stats_bot SET commands_ran = commands_ran + 1 WHERE session_guid = ?`;
 export const STATS_BOT_INCREMENT_ERRORS_LOGGED_UPDATE = `UPDATE stats_bot SET errors_logged = errors_logged + 1 WHERE session_guid = ?`;
+export const STATS_BOT_SHUTDOWN_UPDATE = `UPDATE stats_bot SET shutdown_time = CURRENT_TIMESTAMP, exit_code = ?, exit_message = ? WHERE session_guid = ?`;
 export const STATS_BOT_CREATE_TABLE = 
     `CREATE TABLE IF NOT EXISTS stats_bot (
         session_guid TEXT NOT NULL PRIMARY KEY,
         start_time TEXT NOT NULL,
+        shutdown_time TEXT,
+        exit_code INTEGER,
+        exit_message TEXT,
         debug_mode INTEGER NOT NULL,
         api_safe INTEGER NOT NULL,
         commands_ran INTEGER NOT NULL DEFAULT 0,

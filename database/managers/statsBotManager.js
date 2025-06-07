@@ -93,6 +93,29 @@ function BOT_STATS_INCREMENT_ERRORS_LOGGED_UPDATE(dbInstance, sessionGuid) {
 };
 
 /**
+ * Updates the bot_stats table with shutdown information.
+ * @param {import('better-sqlite3').Database} dbInstance - The database instance.
+ * @param {UUID} sessionGuid - The GUID of the bot session.
+ * @param {number} exitCode - The exit code of the bot.
+ * @param {string} exitMessage - The exit message of the bot.
+ * @returns {DbRunResult} The result of the update operation.
+ */
+function BOT_STATS_SHUTDOWN_UPDATE(dbInstance, sessionGuid, exitCode, exitMessage) {
+    if (!sessionGuid) {
+        console.warn('[DB] Attempted to update shutdown without a session GUID.');
+        return {success: false, error: new Error('Session GUID is required for shutdown update.')};
+    }
+
+    const shutdownStmt = dbInstance.prepare(sql.STATS_BOT_SHUTDOWN_UPDATE);
+    const shutdownResult = executeRun(shutdownStmt, exitCode, exitMessage, sessionGuid);
+    if (!shutdownResult.success) {
+        loggerError(`[DB] Failed to update shutdown for session ${sessionGuid}.`);
+    }
+
+    return shutdownResult;
+};
+
+/**
  * Intializes the bot_stats tables if it does not exist.
  * @param {import('better-sqlite3').Database} dbInstance - The database instance.
  * @returns {DbRunResult} The result of the table creation operation.
@@ -119,5 +142,6 @@ export {
     BOT_STATS_STARTUP_INSERT,
     BOT_STATS_INCREMENT_COMMANDS_RAN_UPDATE,
     BOT_STATS_INCREMENT_ERRORS_LOGGED_UPDATE,
+    BOT_STATS_SHUTDOWN_UPDATE,
     BOT_STATS_CREATE_TABLE
 };
